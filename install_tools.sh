@@ -32,14 +32,25 @@ echo "============================================="
 
 # Check for Homebrew
 if ! command -v brew &>/dev/null; then
-    log_warn "Homebrew not found. Installing..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    if [[ "$OSTYPE" == "linux-gnu"* ]] || [ "$(uname -s)" = "Linux" ]; then
+        log_warn "Homebrew not found. Skipping Homebrew installation on Linux, using apt/go package managers."
+    else
+        log_warn "Homebrew not found. Installing..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
 fi
 
 # Check for Go (needed for some tools)
 if ! command -v go &>/dev/null; then
-    log_warn "Go not found. Installing via Homebrew..."
-    brew install go
+    if command -v apt-get &>/dev/null; then
+        log_warn "Go not found. Installing via apt..."
+        sudo apt-get update -y && sudo apt-get install -y golang-go
+    elif command -v brew &>/dev/null; then
+        log_warn "Go not found. Installing via Homebrew..."
+        brew install go
+    else
+        log_err "Go compiler not found and no package manager available to install it."
+    fi
 fi
 
 # Ensure Go bin is in PATH early so go install binaries are visible
@@ -60,19 +71,66 @@ BREW_TOOLS=(
 )
 
 echo ""
-echo "[*] Installing tools via Homebrew..."
-for tool in "${BREW_TOOLS[@]}"; do
-    if command -v "$tool" &>/dev/null; then
-        log_ok "$tool already installed ($(command -v "$tool"))"
-    else
-        echo "    Installing $tool..."
-        if brew install "$tool" 2>/dev/null; then
-            log_ok "$tool installed successfully"
+if command -v brew &>/dev/null; then
+    echo "[*] Installing tools via Homebrew..."
+    for tool in "${BREW_TOOLS[@]}"; do
+        if command -v "$tool" &>/dev/null; then
+            log_ok "$tool already installed ($(command -v "$tool"))"
         else
-            log_err "$tool failed to install via brew, trying alternative..."
+            echo "    Installing $tool..."
+            if brew install "$tool" 2>/dev/null; then
+                log_ok "$tool installed successfully"
+            else
+                log_err "$tool failed to install via brew"
+            fi
+        fi
+    done
+else
+    echo "[*] Homebrew not found. Installing tools via apt and go..."
+    # Install apt tools
+    APT_TOOLS=()
+    for tool in nmap ffuf amass; do
+        if ! command -v "$tool" &>/dev/null; then
+            APT_TOOLS+=("$tool")
+        else
+            log_ok "$tool already installed ($(command -v "$tool"))"
+        fi
+    done
+    if [ ${#APT_TOOLS[@]} -gt 0 ] && command -v apt-get &>/dev/null; then
+        echo "    Installing ${APT_TOOLS[*]} via apt-get..."
+        if sudo apt-get update -y && sudo apt-get install -y "${APT_TOOLS[@]}"; then
+            for tool in "${APT_TOOLS[@]}"; do log_ok "$tool installed via apt"; done
+        else
+            for tool in "${APT_TOOLS[@]}"; do log_err "$tool failed to install via apt"; done
         fi
     fi
-done
+
+    # Install PD tools via Go
+    PD_TOOLS=(
+        "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
+        "github.com/projectdiscovery/httpx/cmd/httpx@latest"
+        "github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest"
+    )
+    PD_NAMES=(
+        "subfinder"
+        "httpx"
+        "nuclei"
+    )
+    for i in "${!PD_TOOLS[@]}"; do
+        tool_name="${PD_NAMES[$i]}"
+        tool_path="${PD_TOOLS[$i]}"
+        if command -v "$tool_name" &>/dev/null; then
+            log_ok "$tool_name already installed"
+        else
+            echo "    Installing $tool_name via go..."
+            if go install "$tool_path" 2>/dev/null; then
+                log_ok "$tool_name installed successfully"
+            else
+                log_err "$tool_name failed to install via go"
+            fi
+        fi
+    done
+fi
 
 # Tools to install via Go
 echo ""
