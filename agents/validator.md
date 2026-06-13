@@ -5,7 +5,7 @@ tools:
   Read: true
   Bash: true
   WebFetch: true
-model: minimax/MiniMax-M3
+model: venice/minimax-m3
 ---
 
 # Validator Agent

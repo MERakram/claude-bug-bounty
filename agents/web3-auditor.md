@@ -6,7 +6,7 @@ tools:
   Bash: true
   Glob: true
   Grep: true
-model: minimax/MiniMax-M3
+model: venice/minimax-m3
 ---
 
 # Web3 Auditor Agent

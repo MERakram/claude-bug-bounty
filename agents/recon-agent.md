@@ -7,7 +7,7 @@ tools:
   Write: true
   Glob: true
   Grep: true
-model: minimax/MiniMax-M3
+model: venice/minimax-m3
 ---
 
 # Recon Agent
