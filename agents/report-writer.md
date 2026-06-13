@@ -5,7 +5,7 @@ tools:
   Read: true
   Write: true
   Bash: true
-model: claude-opus-4-7
+model: nvidia/minimaxai/minimax-m3
 ---
 
 # Report Writer Agent

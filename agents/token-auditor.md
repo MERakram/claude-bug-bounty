@@ -6,7 +6,7 @@ tools:
   Bash: true
   Glob: true
   Grep: true
-model: claude-sonnet-4-6
+model: nvidia/minimaxai/minimax-m3
 ---
 
 # Token Auditor Agent

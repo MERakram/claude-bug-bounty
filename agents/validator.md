@@ -5,7 +5,7 @@ tools:
   Read: true
   Bash: true
   WebFetch: true
-model: claude-sonnet-4-6
+model: nvidia/minimaxai/minimax-m3
 ---
 
 # Validator Agent

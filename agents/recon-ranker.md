@@ -6,7 +6,7 @@ tools:
   Bash: true
   Glob: true
   Grep: true
-model: claude-haiku-4-5-20251001
+model: nvidia/minimaxai/minimax-m3
 ---
 
 # Recon Ranker Agent

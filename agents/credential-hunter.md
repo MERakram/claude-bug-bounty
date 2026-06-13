@@ -6,7 +6,7 @@ tools:
   Read: true
   Write: true
   AskUserQuestion: true
-model: claude-sonnet-4-6
+model: nvidia/minimaxai/minimax-m3
 ---
 
 # Credential Hunter Agent
