@@ -105,6 +105,25 @@ else
         fi
     fi
 
+    # Fallback to Go install for ffuf and amass if they failed to install via apt
+    if ! command -v ffuf &>/dev/null; then
+        echo "    Installing ffuf via go..."
+        if go install github.com/ffuf/ffuf/v2@latest 2>/dev/null; then
+            log_ok "ffuf installed successfully via go"
+        else
+            log_err "ffuf failed to install via go"
+        fi
+    fi
+
+    if ! command -v amass &>/dev/null; then
+        echo "    Installing amass via go..."
+        if go install github.com/owasp-amass/amass/v4/...@latest 2>/dev/null || go install github.com/OWASP/Amass/v3/...@latest 2>/dev/null; then
+            log_ok "amass installed successfully via go"
+        else
+            log_err "amass failed to install via go"
+        fi
+    fi
+
     # Install PD tools via Go
     PD_TOOLS=(
         "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
