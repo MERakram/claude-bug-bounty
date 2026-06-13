@@ -5,7 +5,7 @@ tools:
   Read: true
   Bash: true
   WebFetch: true
-model: nvidia/minimaxai/minimax-m3
+model: minimax/MiniMax-M3
 ---
 
 # Validator Agent

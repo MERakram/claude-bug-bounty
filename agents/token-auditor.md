@@ -6,7 +6,7 @@ tools:
   Bash: true
   Glob: true
   Grep: true
-model: nvidia/minimaxai/minimax-m3
+model: minimax/MiniMax-M3
 ---
 
 # Token Auditor Agent

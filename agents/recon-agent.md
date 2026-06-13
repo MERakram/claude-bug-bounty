@@ -7,7 +7,7 @@ tools:
   Write: true
   Glob: true
   Grep: true
-model: nvidia/minimaxai/minimax-m3
+model: minimax/MiniMax-M3
 ---
 
 # Recon Agent

@@ -6,7 +6,7 @@ tools:
   Read: true
   Write: true
   AskUserQuestion: true
-model: nvidia/minimaxai/minimax-m3
+model: minimax/MiniMax-M3
 ---
 
 # Credential Hunter Agent

@@ -5,7 +5,7 @@ tools:
   Read: true
   Write: true
   Bash: true
-model: nvidia/minimaxai/minimax-m3
+model: minimax/MiniMax-M3
 ---
 
 # Report Writer Agent
