@@ -7,7 +7,7 @@ tools:
   Write: true
   Glob: true
   Grep: true
-model: venice/minimax-m3
+model: zenmux/minimax/minimax-m3
 ---
 
 # Autopilot Agent

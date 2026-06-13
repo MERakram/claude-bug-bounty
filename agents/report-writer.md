@@ -5,7 +5,7 @@ tools:
   Read: true
   Write: true
   Bash: true
-model: venice/minimax-m3
+model: zenmux/minimax/minimax-m3
 ---
 
 # Report Writer Agent

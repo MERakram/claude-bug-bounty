@@ -2,19 +2,19 @@
   "$schema": "https://opencode.ai/config.json",
   "theme": "system",
   "provider": {
-    "venice": {
+    "zenmux": {
       "api": "openai",
       "options": {
         "apiKey": "{env:NVIDIA_API_KEY}",
         "baseURL": "https://integrate.api.nvidia.com/v1"
       },
       "models": {
-        "minimax-m3": {
+        "minimax/minimax-m3": {
           "id": "minimaxai/minimax-m3",
           "name": "MiniMax M3"
         }
       }
     }
   },
-  "model": "venice/minimax-m3"
+  "model": "zenmux/minimax/minimax-m3"
 }

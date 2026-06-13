@@ -6,7 +6,7 @@ tools:
   Read: true
   Write: true
   AskUserQuestion: true
-model: venice/minimax-m3
+model: zenmux/minimax/minimax-m3
 ---
 
 # Credential Hunter Agent
