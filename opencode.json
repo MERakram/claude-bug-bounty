@@ -7,6 +7,11 @@
       "options": {
         "apiKey": "{env:NVIDIA_API_KEY}",
         "baseURL": "https://integrate.api.nvidia.com/v1"
+      },
+      "models": {
+        "minimaxai/minimax-m3": {
+          "name": "MiniMax M3"
+        }
       }
     }
   },
