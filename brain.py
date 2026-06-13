@@ -3,16 +3,17 @@ from __future__ import annotations
 
 """
 Brain — Multi-Provider LLM Reasoning Layer for Bug Bounty & VAPT
-Supports: Ollama (local), Claude API, OpenAI, Grok (xAI)
+Supports: Ollama (local), Claude API, OpenAI, Grok (xAI), NVIDIA NIM
 
 Provider selection (in order of precedence):
-  1. BRAIN_PROVIDER env var  (ollama | claude | openai | grok)
+  1. BRAIN_PROVIDER env var  (ollama | claude | openai | grok | nvidia)
   2. Auto-detect: uses first provider whose API key / server is available
 
 API keys (env vars):
   ANTHROPIC_API_KEY   — Claude (claude-opus-4-7, claude-sonnet-4-6, etc.)
   OPENAI_API_KEY      — OpenAI (gpt-4o, o1, etc.)
   XAI_API_KEY         — Grok (grok-2-latest, grok-3-mini, etc.)
+  NVIDIA_API_KEY      — NVIDIA NIM (minimaxai/minimax-m3, etc.)
   OLLAMA_HOST         — Ollama base URL (default: http://localhost:11434)
 
 Default model priority (uses first available):
@@ -71,7 +72,7 @@ OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 
 class LLMClient:
     """
-    Unified chat interface for Ollama, Groq, DeepSeek, Claude, OpenAI, and Grok.
+    Unified chat interface for Ollama, Groq, DeepSeek, Claude, OpenAI, Grok, and NVIDIA NIM.
 
     Usage:
         client = LLMClient()          # auto-detect provider
@@ -83,10 +84,11 @@ class LLMClient:
         ollama   — local, zero cost (default: http://localhost:11434)
         groq     — cloud free tier, GROQ_API_KEY    (https://console.groq.com)
         deepseek — very cheap,      DEEPSEEK_API_KEY (https://platform.deepseek.com)
+        nvidia   — NVIDIA NIM,      NVIDIA_API_KEY   (https://integrate.api.nvidia.com)
     """
 
     # Priority: free-local first, free-cloud second, paid last
-    PROVIDER_PRIORITY = ["ollama", "groq", "deepseek", "claude", "openai", "grok"]
+    PROVIDER_PRIORITY = ["ollama", "nvidia", "groq", "deepseek", "claude", "openai", "grok"]
 
     # Default models per provider
     DEFAULT_MODELS = {
@@ -95,6 +97,7 @@ class LLMClient:
         "grok":     "grok-2-latest",
         "groq":     "llama-3.3-70b-versatile",
         "deepseek": "deepseek-chat",
+        "nvidia":   "minimaxai/minimax-m3",
         "ollama":   None,  # resolved dynamically
     }
 
@@ -117,6 +120,7 @@ class LLMClient:
         "grok":     "XAI_API_KEY",
         "groq":     "GROQ_API_KEY",
         "deepseek": "DEEPSEEK_API_KEY",
+        "nvidia":   "NVIDIA_API_KEY",
     }
 
     def _auto_detect(self) -> str:
@@ -215,6 +219,19 @@ class LLMClient:
             self.available   = True
             self.description = "DeepSeek API (deepseek-chat / deepseek-reasoner)"
 
+        elif provider == "nvidia":
+            key = os.environ.get("NVIDIA_API_KEY", "")
+            if not key:
+                return
+            import requests
+            self._http = requests.Session()
+            self._http.headers.update({"Authorization": f"Bearer {key}",
+                                       "Accept": "application/json",
+                                       "Content-Type": "application/json"})
+            self._api_base   = "https://integrate.api.nvidia.com/v1"
+            self.available   = True
+            self.description = "NVIDIA NIM API"
+
     def chat(self, model: str | None, system: str, user: str,
              max_tokens: int = 4000, temperature: float = 0.1) -> str:
         """Send a chat request; return the assistant reply as a string."""
@@ -225,7 +242,7 @@ class LLMClient:
                 return self._chat_ollama(model, system, user, max_tokens, temperature)
             elif self.provider == "claude":
                 return self._chat_claude(model, system, user, max_tokens, temperature)
-            elif self.provider in ("openai", "grok", "groq", "deepseek"):
+            elif self.provider in ("openai", "grok", "groq", "deepseek", "nvidia"):
                 return self._chat_openai_compat(model, system, user, max_tokens, temperature)
         except Exception as e:
             print(f"{YELLOW}[Brain/{self.provider}] chat error: {e}{NC}", flush=True)
@@ -290,6 +307,8 @@ class LLMClient:
             return ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768", "gemma2-9b-it"]
         elif self.provider == "deepseek":
             return ["deepseek-chat", "deepseek-reasoner"]
+        elif self.provider == "nvidia":
+            return ["minimaxai/minimax-m3"]
         return []
 
 # Model preference order — first available wins

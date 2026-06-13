@@ -17,7 +17,7 @@ sys.path.insert(0, ROOT)
 
 @pytest.fixture
 def brain_module(monkeypatch):
-    for env in ("BRAIN_PROVIDER", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "XAI_API_KEY"):
+    for env in ("BRAIN_PROVIDER", "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "XAI_API_KEY", "GROQ_API_KEY", "DEEPSEEK_API_KEY", "NVIDIA_API_KEY"):
         monkeypatch.delenv(env, raising=False)
     import brain
     importlib.reload(brain)
@@ -64,7 +64,7 @@ def test_openai_and_grok_keys_both_front_nothing_available(brain_module, monkeyp
     assert chosen == "ollama"
     assert set(tracker.calls[:2]) == {"openai", "grok"}, \
         "key-bearing providers must be probed before the rest"
-    assert tracker.calls[2:] == ["ollama", "claude"], \
+    assert tracker.calls[2:] == ["ollama", "nvidia", "groq", "deepseek", "claude"], \
         "providers without keys keep their original relative order"
 
 

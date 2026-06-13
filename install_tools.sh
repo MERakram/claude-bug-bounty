@@ -24,6 +24,7 @@ NC='\033[0m'
 log_ok()   { echo -e "${GREEN}[+]${NC} $1"; }
 log_err()  { echo -e "${RED}[-]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[!]${NC} $1"; }
+_have()    { command -v "$1" &>/dev/null; }
 
 echo "============================================="
 echo "  Bug Bounty Tool Installer"
@@ -308,7 +309,7 @@ fi
 echo ""
 echo "[*] Installing Python dependencies..."
 if command -v python3 &>/dev/null && [ -f requirements.txt ]; then
-    if python3 -m pip install -r requirements.txt; then
+    if python3 -m pip install -r requirements.txt --break-system-packages 2>/dev/null || python3 -m pip install -r requirements.txt; then
         log_ok "Python dependencies installed"
     else
         log_warn "Python dependencies could not be installed automatically"
